@@ -989,6 +989,7 @@ void EbSetThreadManagementParameters(
         EB_U32 lps = configPtr->logicalProcessors == 0 ? numLogicProcessors:
             configPtr->logicalProcessors < numLogicProcessors ? configPtr->logicalProcessors : numLogicProcessors;
         groupAffinity.Mask = GetAffinityMask(lps);
+
     }
     else if (numGroups > 1) { // For system with multiple processor group
         if (configPtr->logicalProcessors == 0) {
@@ -1020,8 +1021,25 @@ void EbSetThreadManagementParameters(
     if (numGroups == 1) {
         EB_U32 lps = configPtr->logicalProcessors == 0 ? numLogicProcessors:
             configPtr->logicalProcessors < numLogicProcessors ? configPtr->logicalProcessors : numLogicProcessors;
-        for(EB_U32 i=0; i<lps; i++)
+
+        printf("BEFORE CPUSET");
+        for (int i = 0; i < lps; i++) {
+            printf("%d-", CPU_ISSET(i, &groupAffinity));
+        }printf("\n");
+
+        for(EB_U32 i=0; i<lps; i++){
             CPU_SET(lpGroup[0].group[i], &groupAffinity);
+            printf("%d", lpGroup[0].group[i]);
+        }printf("\n");
+
+
+        printf("AFTER CPUSET");
+        for (int i = 0 ; i < lps ; i++){
+            printf("%d-",CPU_ISSET(i,&groupAffinity));
+        }printf("\n");
+
+        printf("lps: %d\n", (int)lps);
+        
     }
     else if (numGroups > 1) {
         EB_U32 numLpPerGroup = numLogicProcessors / numGroups;
@@ -1055,6 +1073,8 @@ void EbSetThreadManagementParameters(
         }
     }
 #endif
+
+
 }
 
 /**********************************
